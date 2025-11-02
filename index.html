@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuryaEV Trac Mobile Mockup</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom styles for the mobile container */
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #app-container {
+            width: 100%;
+            max-width: 400px;
+            height: 800px; /* Fixed height for mockup presentation */
+            background-color: #ffffff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border-radius: 2rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .nav-icon {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .nav-icon.selected {
+            color: #facc15; /* Tailwind yellow-400 */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- Content Area -->
+        <div id="screen-content" class="flex-grow p-5 overflow-y-auto">
+            <!-- Dynamic content will be rendered here -->
+        </div>
+
+        <!-- Navigation Bar (Always visible for non-login screens) -->
+        <div id="nav-bar" class="hidden h-16 border-t border-gray-100 flex justify-around items-center bg-white shadow-xl z-20">
+            <!-- Icons rendered by JS -->
+        </div>
+
+        <!-- Alert Pop-up Modal (Hidden by default) -->
+        <div id="alert-modal" class="hidden absolute inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center p-4 z-30">
+            <!-- Alert content rendered here -->
+        </div>
+
+    </div>
+
+    <script>
+        // --- TEXT CONSTANTS FOR LOCALIZATION ---
+        const TEXTS = {
+            english: {
+                // Global
+                appName: "SuryaEV Trac",
+                language: "Language: English",
+                back: "Back",
+                home: "Home",
+                health: "Health",
+                logbook: "Logbook",
+                settings: "Settings",
+                // Login Screen (Screen 1)
+                welcome: "Welcome to your Smart Tractor",
+                welcomeHindi: "स्वागत है",
+                inputPlaceholder: "Enter your 10-digit mobile number",
+                getOtp: "Get OTP",
+                help: "Need Help? Call Support",
+                // OTP Screen (Screen 1b)
+                otpMessage: "Enter the 6-digit OTP sent to your number",
+                verifyLogin: "Verify & Login",
+                // Home Dashboard (Screen 2)
+                hoursRemaining: "Hours of Work Remaining",
+                solarCard: "Solar Charging:",
+                solarStatus: "ACTIVE",
+                gpsCard: "GPS:",
+                gpsStatus: "Home Farm (Secure)",
+                lockTractor: "LOCK TRACTOR",
+                tractorLocked: "TRACTOR LOCKED",
+                // Health & Safety (Screen 3)
+                screenTitleHealth: "Health & Safety",
+                coolingSystem: "Smart Cooling System",
+                batteryTemp: "Battery Temperature:",
+                optimal: "Optimal",
+                coolantLevel: "Coolant Level:",
+                systemStatus: "System Status: Stable",
+                farmerSafety: "Farmer Safety System",
+                tiltSensor: "Tilt Sensor Status:",
+                activeSafe: "ACTIVE (SAFE)",
+                killSwitch: "Kill Switch Status:",
+                ready: "READY",
+                emergencyContact: "Emergency Contact:",
+                enabled: "(Enabled)",
+                motorDrivetrain: "Motor & Drivetrain",
+                motorTemp: "Motor Temperature:",
+                normal: "Normal",
+                currentLoad: "Current Load:",
+                // Logbook (Screen 4)
+                screenTitleLogbook: "Work Logbook",
+                today: "Today",
+                weekly: "Weekly",
+                monthly: "Monthly",
+                summaryTitle: "Today's Summary",
+                weeklySummary: "Weekly Summary", // NEW
+                monthlySummary: "Monthly Summary", // NEW
+                workDuration: "Work Duration:",
+                areaCovered: "Area Covered:",
+                energyUsed: "Energy Used:",
+                recentHistory: "Recent History",
+                recentWeeks: "Recent Weeks", // NEW
+                recentMonths: "Recent Months", // NEW
+                // Alert Pop-up (Screen 5)
+                alertTitle: "CRITICAL ALERT",
+                alertMessage: "A dangerous tractor tilt has been detected! The motor has been shut down.",
+                alertAction: "Sending an SMS alert to your emergency contact: Anand.",
+                iamOk: "I AM OK",
+                callContact: "Call Contact",
+            },
+            hindi: {
+                // Global
+                appName: "सूर्यईवी ट्रॅक",
+                language: "भाषा: हिन्दी",
+                back: "वापस",
+                home: "होम",
+                health: "स्वास्थ्य",
+                logbook: "लॉगबुक",
+                settings: "सेटिंग्स",
+                // Login Screen (Screen 1)
+                welcome: "आपके स्मार्ट ट्रैक्टर में आपका स्वागत है",
+                welcomeHindi: "स्वागत है",
+                inputPlaceholder: "अपना १० अंकों का मोबाइल नंबर दर्ज करें",
+                getOtp: "ओटीपी पाएं",
+                help: "सहायता चाहिए? कॉल करें",
+                // OTP Screen (Screen 1b)
+                otpMessage: "आपके नंबर पर भेजा गया ६ अंकों का ओटीपी दर्ज करें",
+                verifyLogin: "सत्यापित करें और लॉगिन करें",
+                // Home Dashboard (Screen 2)
+                hoursRemaining: "कार्य के शेष घंटे",
+                solarCard: "सौर चार्जिंग:",
+                solarStatus: "सक्रिय",
+                gpsCard: "जीपीएस:",
+                gpsStatus: "गृह फार्म (सुरक्षित)",
+                lockTractor: "ट्रैक्टर लॉक करें",
+                tractorLocked: "ट्रैक्टर लॉक है",
+                // Health & Safety (Screen 3)
+                screenTitleHealth: "स्वास्थ्य और सुरक्षा",
+                coolingSystem: "स्मार्ट कूलिंग सिस्टम",
+                batteryTemp: "बैटरी तापमान:",
+                optimal: "इष्टतम",
+                coolantLevel: "शीतलक स्तर:",
+                systemStatus: "सिस्टम स्थिति: स्थिर",
+                farmerSafety: "किसान सुरक्षा प्रणाली",
+                tiltSensor: "टिल्ट सेंसर स्थिति:",
+                activeSafe: "सक्रिय (सुरक्षित)",
+                killSwitch: "किल स्विच स्थिति:",
+                ready: "तैयार",
+                emergencyContact: "आपातकालीन संपर्क:",
+                enabled: "(सक्षम)",
+                motorDrivetrain: "मोटर और ड्राइवट्रेन",
+                motorTemp: "मोटर तापमान:",
+                normal: "सामान्य",
+                currentLoad: "वर्तमान लोड:",
+                // Logbook (Screen 4)
+                screenTitleLogbook: "कार्य लॉगबुक",
+                today: "आज",
+                weekly: "साप्ताहिक",
+                monthly: "मासिक",
+                summaryTitle: "आज का सारांश",
+                weeklySummary: "साप्ताहिक सारांश", // NEW
+                monthlySummary: "मासिक सारांश", // NEW
+                workDuration: "काम की अवधि:",
+                areaCovered: "तय क्षेत्र:",
+                energyUsed: "ऊर्जा खपत:",
+                recentHistory: "पिछला रिकॉर्ड",
+                recentWeeks: "पिछला सप्ताह", // NEW
+                recentMonths: "पिछला महीना", // NEW
+                // Alert Pop-up (Screen 5)
+                alertTitle: "गंभीर चेतावनी",
+                alertMessage: "खतरनाक ट्रैक्टर झुकाव का पता चला है! मोटर बंद कर दी गई है।",
+                alertAction: "आपके आपातकालीन संपर्क: आनंद को एक एसएमएस अलर्ट भेजा जा रहा है।",
+                iamOk: "मैं ठीक हूँ",
+                callContact: "संपर्क को कॉल करें",
+            }
+        };
+
+        // --- STATE MANAGEMENT ---
+        let currentScreen = 'login';
+        let language = 'english'; // Default language
+        let tractorLocked = true;
+        let showAlert = false;
+        let logbookPeriod = 'today'; // NEW: State for logbook tab
+
+        const contentDiv = document.getElementById('screen-content');
+        const navBar = document.getElementById('nav-bar');
+        const alertModal = document.getElementById('alert-modal');
+
+        // Helper to get text in the current language
+        var T = (key) => TEXTS[language][key];
+
+        // --- NAVIGATION & EVENT HANDLERS ---
+
+        const setLanguage = (lang) => {
+            language = lang;
+            renderScreen(currentScreen);
+        };
+
+        const goToScreen = (screenName) => {
+            currentScreen = screenName;
+            renderScreen(screenName);
+        };
+
+        const toggleLock = () => {
+            tractorLocked = !tractorLocked;
+            renderScreen('home'); // Re-render home to show new state
+        };
+
+        const toggleAlert = (state) => {
+            showAlert = state;
+            alertModal.innerHTML = state ? renderAlertModal() : '';
+            alertModal.classList.toggle('hidden', !state);
+            // Optionally dim the background content
+            document.getElementById('screen-content').style.opacity = state ? 0.3 : 1;
+            navBar.style.opacity = state ? 0.3 : 1;
+        }
+
+        // NEW: Logbook period setter
+        const setLogbookPeriod = (period) => {
+            logbookPeriod = period;
+            renderScreen('logbook');
+        };
+
+        // NEW: Logbook data provider
+        const getLogbookData = (period) => {
+            switch (period) {
+                case 'weekly':
+                    return {
+                        summaryTitle: T('weeklySummary'),
+                        workDuration: "28.5 Hours",
+                        areaCovered: "16.8 Acres",
+                        energyUsed: "220 kWh",
+                        historyTitle: T('recentWeeks'),
+                        history: [
+                            { date: "Week 44", duration: "24.1 Hours", area: "14.5 Acres" },
+                            { date: "Week 43", duration: "30.0 Hours", area: "18.0 Acres" },
+                            { date: "Week 42", duration: "25.5 Hours", area: "15.2 Acres" },
+                        ]
+                    };
+                case 'monthly':
+                    return {
+                        summaryTitle: T('monthlySummary'),
+                        workDuration: "115.0 Hours",
+                        areaCovered: "65.0 Acres",
+                        energyUsed: "880 kWh",
+                        historyTitle: T('recentMonths'),
+                        history: [
+                            { date: "October", duration: "105.5 Hours", area: "58.0 Acres" },
+                            { date: "September", duration: "125.0 Hours", area: "70.5 Acres" },
+                        ]
+                    };
+                case 'today':
+                default:
+                    return {
+                        summaryTitle: T('summaryTitle'),
+                        workDuration: "4.2 Hours",
+                        areaCovered: "2.5 Acres",
+                        energyUsed: "30 kWh",
+                        historyTitle: T('recentHistory'),
+                        history: [
+                            { date: "Oct 31", duration: "3.8 Hours", area: "2.1 Acres" },
+                            { date: "Oct 30", duration: "5.1 Hours", area: "3.0 Acres" },
+                        ]
+                    };
+            }
+        }
+
+
+        // --- RENDERING FUNCTIONS ---
+
+        // Render the main content area
+        const renderScreen = (screen) => {
+            let html = '';
+            navBar.classList.add('hidden');
+            document.getElementById('screen-content').style.padding = '1.25rem'; // Default padding
+
+            switch (screen) {
+                case 'login':
+                    html = renderLoginScreen();
+                    break;
+                case 'otp':
+                    html = renderOTPScreen();
+                    break;
+                case 'home':
+                    html = renderHomeDashboard();
+                    navBar.classList.remove('hidden');
+                    break;
+                case 'health':
+                    html = renderHealthSafetyScreen();
+                    navBar.classList.remove('hidden');
+                    break;
+                case 'logbook':
+                    html = renderLogbookScreen();
+                    navBar.classList.remove('hidden');
+                    break;
+                default:
+                    html = renderLoginScreen();
+            }
+            contentDiv.innerHTML = html;
+            // Re-render Lucide icons
+            lucide.createIcons();
+            // Ensure the alert modal state is correct
+            toggleAlert(showAlert);
+            renderNavBar(screen);
+        };
+
+        // Screen 1: Login Screen
+        const renderLoginScreen = () => {
+            const isEnglish = language === 'english';
+            return `
+                <!-- Language Selector -->
+                <div class="flex justify-end mb-16">
+                    <img src="0f286c57-2798-40f6-9047-81a19fe637ad.jpg"  style="margin-right:115px;"  width="100" height="100">
+
+    
+                    <button onclick="setLanguage('${isEnglish ? 'hindi' : 'english'}')" class="text-sm font-semibold text-gray-500 hover:text-gray-700 transition duration-150">
+                        <i data-lucide="globe" class="inline-block w-4 h-4 mr-1"></i>
+                        ${isEnglish ? 'Language: Hindi' : 'Language: English'}
+                    </button>
+                </div>
+
+                <!-- Logo -->
+                <div class="text-center mb-10">
+                    <div class="text-4xl font-extrabold text-blue-800">SuryaEV Trac</div>
+                    <p class="text-xs font-semibold text-gray-600 tracking-wider mt-1">SMART FARMING</p>
+                </div>
+
+                <!-- Welcome Message -->
+                <div class="text-center mb-10">
+                    <h1 class="text-2xl font-bold text-gray-800">${T('welcome')}</h1>
+                    <p class="text-xl font-medium text-blue-600 mt-1">${T('welcomeHindi')}</p>
+                </div>
+
+                <!-- Login Field -->
+                <div class="space-y-6">
+                    <input type="tel" id="phone-number" maxlength="10" placeholder="${T('inputPlaceholder')}"
+                           class="w-full px-5 py-4 border-2 border-gray-300 rounded-xl text-lg focus:outline-none focus:ring-4 focus:ring-yellow-100 focus:border-yellow-500 transition shadow-sm">
+
+                    <button onclick="goToScreen('otp')"
+                            class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 rounded-xl text-lg transition duration-300 transform hover:scale-[1.01] shadow-lg">
+                        ${T('getOtp')}
+                    </button>
+                </div>
+
+                <!-- Help Button -->
+                <div class="absolute bottom-5 left-0 right-0 text-center p-5">
+                    <a href="tel:0000000000" class="text-sm font-semibold text-blue-600 hover:text-blue-800">
+                        ${T('help')}
+                    </a>
+                  <div style="font-size: 0.875rem; font-weight: 600; color: rgb(37 99 235 / var(--tw-text-opacity, 1));">Created By Team Kshitij</div>
+
+                </div>
+            `;
+        };
+
+        // Screen 1b: OTP Entry
+        const renderOTPScreen = () => {
+             return `
+                <div class="text-center pt-10">
+                    <i data-lucide="shield-check" class="w-16 h-16 text-yellow-500 mx-auto mb-6"></i>
+                    <h1 class="text-xl font-bold text-gray-800 mb-2">${T('otpMessage')}</h1>
+                    <p class="text-sm text-gray-500 mb-10">Verification for +91 XXXXX XXXXX</p>
+
+                    <!-- OTP Input Grid -->
+                    <div class="flex justify-center space-x-3 mb-10">
+                        ${Array(6).fill(0).map(() => `<input type="number" maxlength="1" class="w-10 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition" />`).join('')}
+                    </div>
+
+                    <button onclick="goToScreen('home')"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl text-lg transition duration-300 transform hover:scale-[1.01] shadow-lg">
+                        ${T('verifyLogin')}
+                    </button>
+
+                    <button onclick="goToScreen('login')"
+                            class="mt-4 w-full text-sm text-gray-500 hover:text-gray-700 transition duration-300">
+                        Resend OTP / Use a different number
+                    </button>
+                </div>
+             `;
+        };
+
+
+        // Screen 2: Home Dashboard
+        const renderHomeDashboard = () => {
+            const lockText = tractorLocked ? T('tractorLocked') : T('lockTractor');
+            const lockColor = tractorLocked ? 'bg-green-500 hover:bg-green-600' : 'bg-yellow-400 hover:bg-yellow-500';
+            return `
+                <!-- Top Title Bar -->
+                <div class="flex justify-between items-center mb-10">
+                    <h1 class="text-2xl font-extrabold text-blue-800">${T('appName')}</h1>
+                    <button onclick="toggleAlert(true)" class="p-2 relative">
+                        <!-- Notification Bell Icon (Will turn red if alert is active in the future) -->
+                        <i data-lucide="bell" class="w-6 h-6 text-gray-600"></i>
+                        <span id="alert-indicator" class="${showAlert ? 'absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full' : 'hidden'}"></span>
+                    </button>
+                </div>
+
+                <!-- Main Feature: Work Time (The Hero) -->
+                <div class="bg-blue-800 text-white text-center py-16 rounded-3xl shadow-2xl mb-6">
+                    <i data-lucide="clock" class="w-12 h-12 mx-auto mb-3 text-yellow-400"></i>
+                    <div class="text-7xl font-extrabold mb-1">6.5</div>
+                    <p class="text-xl font-semibold opacity-80">${T('hoursRemaining')}</p>
+                </div>
+
+                <!-- Status Cards -->
+                <div class="flex space-x-4 mb-6">
+                    <!-- Card 1 (Solar) -->
+                    <div class="flex-1 bg-gray-50 p-4 rounded-xl shadow-md flex items-center space-x-3">
+                        <i data-lucide="sun" class="w-8 h-8 text-orange-500"></i>
+                        <div>
+                            <p class="text-xs font-semibold text-gray-500">${T('solarCard')}</p>
+                            <p class="text-sm font-bold text-green-600">${T('solarStatus')}</p>
+                        </div>
+                    </div>
+                    <!-- Card 2 (GPS) -->
+                    <div class="flex-1 bg-gray-50 p-4 rounded-xl shadow-md flex items-center space-x-3">
+                        <i data-lucide="map-pin" class="w-8 h-8 text-red-500"></i>
+                        <div>
+                            <p class="text-xs font-semibold text-gray-500">${T('gpsCard')}</p>
+                            <p class="text-sm font-bold text-gray-700">${T('gpsStatus')}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Action Button: Security (Now placed in the content flow, just above the nav area) -->
+                <div class="pt-4">
+                    <button onclick="toggleLock()"
+                            class="w-full ${lockColor} text-gray-900 font-extrabold py-5 rounded-xl text-xl transition duration-300 shadow-2xl">
+                        <i data-lucide="lock" class="inline-block w-6 h-6 mr-3"></i>
+                        ${lockText}
+                    </button>
+                </div>
+                
+                <!-- Spacer to ensure content scrolls up far enough to clear the fixed navigation bar -->
+                <div class="h-20"></div>
+            `;
+        };
+
+        // Screen 3: Health & Safety
+        const renderHealthSafetyScreen = () => {
+            return `
+                <!-- Title Bar -->
+                <div class="flex items-center mb-6">
+                    <button onclick="goToScreen('home')" class="text-gray-600 hover:text-blue-600 mr-4">
+                        <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                    </button>
+                    <h1 class="text-2xl font-bold text-gray-800">${T('screenTitleHealth')}</h1>
+                </div>
+
+                <div class="space-y-6 pb-20">
+
+                    <!-- Card 1: Smart Cooling System -->
+                    <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-blue-500">
+                        <h2 class="text-lg font-bold text-gray-700 flex items-center mb-4">
+                            <i data-lucide="thermometer" class="w-6 h-6 mr-2 text-blue-500"></i>
+                            ${T('coolingSystem')}
+                        </h2>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <p class="text-gray-500">${T('batteryTemp')}</p>
+                                <p class="font-bold text-lg text-green-600">35°C <span class="text-xs text-gray-500">(${T('optimal')})</span></p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">${T('coolantLevel')}</p>
+                                <p class="font-bold text-lg text-blue-600">95%</p>
+                            </div>
+                            <div class="col-span-2 mt-2 pt-2 border-t border-gray-100">
+                                <p class="flex items-center text-sm font-semibold text-green-600">
+                                    <i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>
+                                    ${T('systemStatus')}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Farmer Safety System -->
+                    <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-green-500">
+                        <h2 class="text-lg font-bold text-gray-700 flex items-center mb-4">
+                            <i data-lucide="shield" class="w-6 h-6 mr-2 text-green-500"></i>
+                            ${T('farmerSafety')}
+                        </h2>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <p class="text-gray-500">${T('tiltSensor')}</p>
+                                <p class="font-bold text-base text-green-600">${T('activeSafe')}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">${T('killSwitch')}</p>
+                                <p class="font-bold text-base text-yellow-600">${T('ready')}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">${T('emergencyContact')}</p>
+                                <p class="font-bold text-base text-gray-700">Anand <span class="text-xs text-green-500">${T('enabled')}</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Motor & Drivetrain -->
+                    <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-gray-400">
+                        <h2 class="text-lg font-bold text-gray-700 flex items-center mb-4">
+                            <i data-lucide="settings" class="w-6 h-6 mr-2 text-gray-500"></i>
+                            ${T('motorDrivetrain')}
+                        </h2>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <p class="text-gray-500">${T('motorTemp')}</p>
+                                <p class="font-bold text-lg text-orange-500">42°C <span class="text-xs text-gray-500">(${T('normal')})</span></p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">${T('currentLoad')}</p>
+                                <p class="font-bold text-lg text-blue-600">60%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        // Screen 4: Logbook
+        const renderLogbookScreen = () => {
+            const logbookData = getLogbookData(logbookPeriod);
+            const activeTabClass = "text-gray-900 bg-white shadow-md";
+            const inactiveTabClass = "text-gray-500 hover:text-gray-700";
+
+            return `
+                <!-- Title Bar -->
+                <div class="flex items-center mb-6">
+                    <button onclick="goToScreen('home')" class="text-gray-600 hover:text-blue-600 mr-4">
+                        <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                    </button>
+                    <h1 class="text-2xl font-bold text-gray-800">${T('screenTitleLogbook')}</h1>
+                </div>
+
+                <!-- Time Tabs -->
+                <div class="flex justify-around bg-gray-100 p-1 rounded-xl mb-6 shadow-inner">
+                    <button onclick="setLogbookPeriod('today')"
+                            class="flex-1 py-2 text-sm font-bold rounded-lg transition duration-200 ${logbookPeriod === 'today' ? activeTabClass : inactiveTabClass}">
+                        ${T('today')}
+                    </button>
+                    <button onclick="setLogbookPeriod('weekly')"
+                            class="flex-1 py-2 text-sm font-bold rounded-lg transition duration-200 ${logbookPeriod === 'weekly' ? activeTabClass : inactiveTabClass}">
+                        ${T('weekly')}
+                    </button>
+                    <button onclick="setLogbookPeriod('monthly')"
+                            class="flex-1 py-2 text-sm font-bold rounded-lg transition duration-200 ${logbookPeriod === 'monthly' ? activeTabClass : inactiveTabClass}">
+                        ${T('monthly')}
+                    </button>
+                </div>
+
+                <!-- "Summary" Card -->
+                <div class="bg-blue-600 text-white p-6 rounded-xl shadow-xl mb-8">
+                    <h2 class="text-xl font-extrabold mb-4">${logbookData.summaryTitle}</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-blue-400/50 pb-2">
+                            <p class="flex items-center font-medium">
+                                <i data-lucide="clock" class="w-5 h-5 mr-3 text-yellow-400"></i>
+                                ${T('workDuration')}
+                            </p>
+                            <p class="text-2xl font-bold">${logbookData.workDuration}</p>
+                        </div>
+                        <div class="flex items-center justify-between border-b border-blue-400/50 pb-2">
+                            <p class="flex items-center font-medium">
+                                <i data-lucide="map" class="w-5 h-5 mr-3 text-yellow-400"></i>
+                                ${T('areaCovered')}
+                            </p>
+                            <p class="text-2xl font-bold">${logbookData.areaCovered}</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <p class="flex items-center font-medium">
+                                <i data-lucide="battery-charging" class="w-5 h-5 mr-3 text-yellow-400"></i>
+                                ${T('energyUsed')}
+                            </p>
+                            <p class="text-2xl font-bold">${logbookData.energyUsed}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- "Recent History" List -->
+                <h2 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">${logbookData.historyTitle}</h2>
+                <div class="space-y-3 pb-16">
+                    ${logbookData.history.map(item => `
+                        <!-- History Item -->
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border-l-4 border-gray-400">
+                            <span class="font-medium text-gray-700">${item.date}</span>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-blue-600">${item.duration}</p>
+                                <p class="text-xs text-gray-500">${item.area}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        };
+
+        // Screen 5: Alert Pop-up Modal
+        const renderAlertModal = () => {
+            return `
+                <div class="bg-white rounded-xl p-6 w-full max-w-sm border-4 border-red-500 shadow-2xl animate-in fade-in zoom-in duration-300">
+                    <!-- Icon -->
+                    <div class="text-center mb-4">
+                        <i data-lucide="alert-triangle" class="w-16 h-16 text-red-600 mx-auto"></i>
+                    </div>
+
+                    <!-- Title -->
+                    <h2 class="text-2xl font-extrabold text-red-600 text-center mb-4">${T('alertTitle')}</h2>
+
+                    <!-- Message -->
+                    <p class="text-lg text-gray-800 text-center mb-4">${T('alertMessage')}</p>
+
+                    <!-- Consequence -->
+                    <p class="text-sm text-gray-600 italic text-center mb-6">${T('alertAction')}</p>
+
+                    <!-- Buttons -->
+                    <div class="space-y-3">
+                        <button onclick="toggleAlert(false)"
+                                class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-lg transition duration-300 shadow-md">
+                            ${T('iamOk')}
+                        </button>
+                        <a href="tel:0000000000"
+                           class="block text-center w-full bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-3 rounded-xl text-lg transition duration-300">
+                            ${T('callContact')}
+                        </a>
+                    </div>
+                </div>
+            `;
+        };
+
+        // Navigation Bar Rendering
+        const renderNavBar = (current) => {
+            const icons = [
+                { id: 'home', icon: 'home', screen: 'home' },
+                { id: 'health', icon: 'shield', screen: 'health' },
+                { id: 'logbook', icon: 'book-open', screen: 'logbook' },
+                { id: 'settings', icon: 'settings', screen: 'settings' }
+            ];
+
+            navBar.innerHTML = icons.map(item => {
+                const isSelected = item.screen === current;
+                const colorClass = isSelected ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-600';
+                const label = T(item.id);
+                const clickHandler = item.screen !== 'settings' ? `goToScreen('${item.screen}')` : 'void(0)'; // Settings is a placeholder
+                const cursorStyle = item.screen !== 'settings' ? 'cursor-pointer' : 'cursor-default opacity-50';
+
+                return `
+                    <div class="text-center p-2 ${cursorStyle}" onclick="${clickHandler}">
+                        <i data-lucide="${item.icon}" class="w-6 h-6 mx-auto ${colorClass}"></i>
+                        <p class="text-xs font-medium mt-1 ${isSelected ? 'text-yellow-500' : 'text-gray-500'}">${label}</p>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        };
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            renderScreen('login');
+        };
+
+    </script>
+</body>
+</html>
