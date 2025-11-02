@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,10 +19,12 @@
             align-items: center;
             min-height: 100vh;
         }
+
         #app-container {
             width: 100%;
             max-width: 400px;
-            height: 800px; /* Fixed height for mockup presentation */
+            height: 800px;
+            /* Fixed height for mockup presentation */
             background-color: #ffffff;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             border-radius: 2rem;
@@ -30,15 +33,19 @@
             flex-direction: column;
             position: relative;
         }
+
         .nav-icon {
             cursor: pointer;
             transition: color 0.2s;
         }
+
         .nav-icon.selected {
-            color: #facc15; /* Tailwind yellow-400 */
+            color: #facc15;
+            /* Tailwind yellow-400 */
         }
     </style>
 </head>
+
 <body>
 
     <div id="app-container">
@@ -48,12 +55,14 @@
         </div>
 
         <!-- Navigation Bar (Always visible for non-login screens) -->
-        <div id="nav-bar" class="hidden h-16 border-t border-gray-100 flex justify-around items-center bg-white shadow-xl z-20">
+        <div id="nav-bar"
+            class="hidden h-16 border-t border-gray-100 flex justify-around items-center bg-white shadow-xl z-20">
             <!-- Icons rendered by JS -->
         </div>
 
         <!-- Alert Pop-up Modal (Hidden by default) -->
-        <div id="alert-modal" class="hidden absolute inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center p-4 z-30">
+        <div id="alert-modal"
+            class="hidden absolute inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center p-4 z-30">
             <!-- Alert content rendered here -->
         </div>
 
@@ -77,6 +86,8 @@
                 inputPlaceholder: "Enter your 10-digit mobile number",
                 getOtp: "Get OTP",
                 help: "Need Help? Call Support",
+                helpp: "Created By Team Kshitij",
+
                 // OTP Screen (Screen 1b)
                 otpMessage: "Enter the 6-digit OTP sent to your number",
                 verifyLogin: "Verify & Login",
@@ -142,6 +153,7 @@
                 inputPlaceholder: "अपना १० अंकों का मोबाइल नंबर दर्ज करें",
                 getOtp: "ओटीपी पाएं",
                 help: "सहायता चाहिए? कॉल करें",
+                helpp: "टीम क्षितिज द्वारा निर्मित",
                 // OTP Screen (Screen 1b)
                 otpMessage: "आपके नंबर पर भेजा गया ६ अंकों का ओटीपी दर्ज करें",
                 verifyLogin: "सत्यापित करें और लॉगिन करें",
@@ -348,7 +360,7 @@
                 <!-- Welcome Message -->
                 <div class="text-center mb-10">
                     <h1 class="text-2xl font-bold text-gray-800">${T('welcome')}</h1>
-                    <p class="text-xl font-medium text-blue-600 mt-1">${T('welcomeHindi')}</p>
+
                 </div>
 
                 <!-- Login Field -->
@@ -367,15 +379,16 @@
                     <a href="tel:0000000000" class="text-sm font-semibold text-blue-600 hover:text-blue-800">
                         ${T('help')}
                     </a>
-                  <div style="font-size: 0.875rem; font-weight: 600; color: rgb(37 99 235 / var(--tw-text-opacity, 1));">Created By Team Kshitij</div>
-
-                </div>
+                    <a style="display: block;" href="tel:0000000000" class="text-sm font-semibold text-blue-600 hover:text-blue-800">
+                        ${T('helpp')}
+                    </a>
+                 
             `;
         };
 
         // Screen 1b: OTP Entry
         const renderOTPScreen = () => {
-             return `
+            return `
                 <div class="text-center pt-10">
                     <i data-lucide="shield-check" class="w-16 h-16 text-yellow-500 mx-auto mb-6"></i>
                     <h1 class="text-xl font-bold text-gray-800 mb-2">${T('otpMessage')}</h1>
@@ -678,4 +691,5 @@
 
     </script>
 </body>
+
 </html>
